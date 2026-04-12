@@ -25,14 +25,25 @@ describe('clampAngle', () => {
   it('clamps below 0', () => expect(clampAngle(-10)).toBe(0))
   it('clamps above 180', () => expect(clampAngle(200)).toBe(180))
   it('passes through midrange', () => expect(clampAngle(90)).toBe(90))
+  it('leaves 0 unchanged', () => expect(clampAngle(0)).toBe(0))
+  it('leaves 180 unchanged', () => expect(clampAngle(180)).toBe(180))
 })
 
 describe('randomTarget', () => {
   it('always returns a value in [15, 165]', () => {
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 500; i++) {
       const t = randomTarget()
       expect(t).toBeGreaterThanOrEqual(15)
       expect(t).toBeLessThanOrEqual(165)
     }
+  })
+
+  it('produces values across the full range, not just near the edges', () => {
+    const samples = Array.from({ length: 500 }, randomTarget)
+    const min = Math.min(...samples)
+    const max = Math.max(...samples)
+    // With 500 samples, min should be well below 20 and max well above 160
+    expect(min).toBeLessThan(20)
+    expect(max).toBeGreaterThan(160)
   })
 })

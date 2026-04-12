@@ -1,6 +1,6 @@
 import type { GameState } from './gameState'
 import type { Action } from './actions'
 
-export function gameReducer(state: GameState, action: Action): GameState {
+export function gameReducer(state: GameState, _action: Action): GameState {
   return state // placeholder — implemented in Step 7
 }
