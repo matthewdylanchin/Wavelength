@@ -3,6 +3,7 @@ import Dial from "./components/dial/Dial";
 import AdjustGuessControl from "./components/game/AdjustGuessControl";
 import SpinKnob from "./components/game/SpinKnob";
 import { randomTarget } from "./lib/dial";
+import { scoreFor } from "./lib/scoring";
 
 export default function App() {
   const [guessAngle, setGuessAngle] = useState(90);
@@ -29,6 +30,10 @@ export default function App() {
         <SpinKnob onSpin={handleSpin} />
         <AdjustGuessControl angle={guessAngle} onChange={setGuessAngle} />
       </div>
+      {/* DEV ONLY — removed in Step 7 */}
+      <p style={{ textAlign: "center", marginTop: "1rem", fontFamily: "monospace" }}>
+        Score: {scoreFor(guessAngle, targetAngle)}
+      </p>
     </div>
   );
 }

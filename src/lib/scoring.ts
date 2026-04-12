@@ -1,13 +1,10 @@
-const BANDS = [
-  { points: 4, halfWidth: 7 },
-  { points: 3, halfWidth: 14 },
-  { points: 2, halfWidth: 22 },
-]
+import { BANDS } from './bands'
 
 export function scoreFor(guessAngle: number, targetAngle: number): number {
   const delta = Math.abs(guessAngle - targetAngle)
+  let best = 0
   for (const band of BANDS) {
-    if (delta <= band.halfWidth) return band.points
+    if (delta <= band.halfWidth) best = Math.max(best, band.points)
   }
-  return 0
+  return best
 }
