@@ -20,11 +20,11 @@ This document defines exactly how Wavelength behaves in this implementation. Whe
 
 Symmetric, centered on `targetAngle`. Half-widths in degrees:
 
-| Points | Half-width | Total span |
-|--------|------------|------------|
-| 4      | 7°         | 14°        |
-| 3      | 14°        | 28°        |
-| 2      | 22°        | 44°        |
+| Points | Half-width | Total span      |
+| ------ | ---------- | --------------- |
+| 4      | 7°         | 14°             |
+| 3      | 14°        | 28°             |
+| 2      | 22°        | 44°             |
 | 0      | —          | everywhere else |
 
 These are tunable. Narrower = harder. Start with these values; adjust during playtesting.
@@ -67,14 +67,16 @@ The game progresses through these phases in order:
 idle → spinning → clue → guessing → revealing → scored → (next round → spinning)
 ```
 
-| Phase       | What's happening                                       | What's enabled                       |
-|-------------|--------------------------------------------------------|--------------------------------------|
-| `idle`      | Initial state before any round starts                  | "Start round" button                 |
-| `spinning`  | Clue giver spins to generate the hidden target         | Spin knob, "Lock in target" button   |
-| `clue`      | Clue giver enters a clue                               | Clue text input, "Submit clue" button|
-| `guessing`  | Guessing team rotates the needle                       | Adjust guess controls, "Reveal" button|
-| `revealing` | Reveal animation playing                               | Nothing (transient)                  |
-| `scored`    | Points shown, waiting for next round                   | "Next round" button                  |
+The `clue` phase doubles as the "peek" phase: the cover lifts so the clue giver can see the target, then drops back down when transitioning to `guessing`.
+
+| Phase       | Cover          | Who sees the target | What's enabled                         |
+| ----------- | -------------- | ------------------- | -------------------------------------- |
+| `idle`      | up             | nobody              | "Start round" button                   |
+| `spinning`  | up             | nobody              | Spin knob, "Lock target" button        |
+| `clue`      | **lifted**     | **clue giver only** | Clue text input, "Pass to team" button |
+| `guessing`  | **back down**  | nobody              | Adjust guess controls, "Reveal" button |
+| `revealing` | animating away | everyone            | Nothing (transient)                    |
+| `scored`    | away           | everyone            | "Next round" button                    |
 
 Rules:
 
@@ -82,19 +84,22 @@ Rules:
 - Transitions happen via reducer actions, not direct state mutation.
 - `targetAngle` is set during `spinning` and immutable from `clue` onward.
 - `guessAngle` is mutable during `guessing` and immutable from `revealing` onward.
-- The reveal cover only animates away when entering `revealing`.
+- The cover visibility is derived from `phase`, not a separate boolean. The same `AnimatePresence` exit animation fires twice per round: once entering `clue` (peek), once entering `scored` (final reveal).
+- "Pass to team" is the single confirmation that the clue giver has seen the target and is ready to hand off — it both ends the peek and starts guessing in one click.
 
 ## Reducer actions
 
 ```
 START_ROUND       — idle/scored → spinning, picks new spectrum
 SPIN              — spinning, generates new targetAngle
-LOCK_TARGET       — spinning → clue
-SUBMIT_CLUE       — clue → guessing, stores clue text
+LOCK_TARGET       — spinning → clue (cover lifts for clue giver)
+SUBMIT_CLUE       — clue → guessing (cover drops, hand off to guessers)
 ADJUST_GUESS      — guessing, updates guessAngle (delta or absolute)
-REVEAL            — guessing → revealing, then → scored, computes points
+REVEAL            — guessing → revealing → scored, computes points, cover animates away
 NEXT_ROUND        — scored → spinning, increments round, resets round state, preserves total score
 ```
+
+> **Naming note:** The action is called `SUBMIT_CLUE` in code but the user-facing button label is "Pass to team". In Step 8, this same action will be extended to carry the actual clue text typed by the clue giver. Until then, it dispatches with an empty clue string.
 
 ## Scoring accumulation
 
