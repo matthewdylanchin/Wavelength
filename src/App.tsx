@@ -6,7 +6,7 @@ import { randomTarget } from "./lib/dial";
 
 export default function App() {
   const [guessAngle, setGuessAngle] = useState(90);
-  const [_targetAngle, setTargetAngle] = useState(90);
+  const [targetAngle, setTargetAngle] = useState(90);
 
   function handleSpin() {
     const next = randomTarget();
@@ -16,7 +16,7 @@ export default function App() {
 
   return (
     <div style={{ padding: "2rem", maxWidth: 900, margin: "0 auto" }}>
-      <Dial guessAngle={guessAngle} />
+      <Dial guessAngle={guessAngle} targetAngle={targetAngle} />
       <div
         style={{
           marginTop: "1.5rem",
