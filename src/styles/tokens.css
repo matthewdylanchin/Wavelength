@@ -1,0 +1,26 @@
+:root {
+  /* Palette */
+  --color-cream: #f5f0e8;
+  --color-cream-dark: #ede6d8;
+  --color-cream-shadow: #d9d0be;
+  --color-brown-soft: #8b7355;
+  --color-brown-dark: #5c4a32;
+  --color-warm-white: #faf7f2;
+
+  /* Scoring band colors */
+  --color-band-4: #e8a87c;   /* bullseye — warm amber */
+  --color-band-3: #d4c4a0;   /* 3-point ring */
+  --color-band-2: #c8b896;   /* 2-point ring */
+
+  /* Spectrum label colors */
+  --color-cold: #7bafd4;
+  --color-hot: #d4735a;
+
+  /* Typography */
+  --font-body: 'Georgia', serif;
+  --font-ui: system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-dial: 0 8px 32px rgba(92, 74, 50, 0.18);
+  --shadow-button: 0 2px 8px rgba(92, 74, 50, 0.15);
+}
