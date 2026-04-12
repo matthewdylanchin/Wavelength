@@ -4,6 +4,7 @@ import AdjustGuessControl from "./components/game/AdjustGuessControl";
 import ClueDisplay from "./components/game/ClueDisplay";
 import ClueInput from "./components/game/ClueInput";
 import SpinKnob from "./components/game/SpinKnob";
+import ScoreDisplay from "./components/game/ScoreDisplay";
 import { gameReducer } from "./state/gameReducer";
 import { initialState } from "./state/gameState";
 
@@ -91,10 +92,11 @@ export default function App() {
       </div>
 
       {phase === "scored" && (
-        <p style={{ textAlign: "center", marginTop: "1rem", fontFamily: "monospace" }}>
-          Round {round.number}: {round.pointsThisRound} pts —{" "}
-          Total: {totalScore + (round.pointsThisRound ?? 0)} pts
-        </p>
+        <ScoreDisplay
+          points={round.pointsThisRound ?? 0}
+          totalScore={totalScore + (round.pointsThisRound ?? 0)}
+          roundNumber={round.number}
+        />
       )}
     </div>
   );
