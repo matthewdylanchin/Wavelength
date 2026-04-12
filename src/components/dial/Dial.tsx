@@ -1,31 +1,34 @@
 import DialBase from './DialBase'
 import GuessNeedle from './GuessNeedle'
+import RevealCover from './RevealCover'
 import TargetLayer from './TargetLayer'
+import { CX, CY, NEEDLE_LENGTH, R } from './dialGeometry'
 
-// SVG coordinate constants — all child components use these same values
-export const CX = 400   // pivot x
-export const CY = 420   // pivot y
-export const R = 360    // semicircle radius
-export const NEEDLE_LENGTH = 320
+// Re-export so any external caller (App.tsx etc.) can import from here if needed
+export { CX, CY, NEEDLE_LENGTH, R }
 
 type Props = {
   guessAngle: number   // degrees, 0–180
   targetAngle: number  // degrees, 0–180
+  revealed: boolean
 }
 
-export default function Dial({ guessAngle, targetAngle }: Props) {
+export default function Dial({ guessAngle, targetAngle, revealed }: Props) {
   return (
     <svg
       viewBox="0 0 800 450"
       style={{ width: '100%', maxWidth: 800, display: 'block' }}
     >
-      {/* Layer 1: cream semicircle base */}
+      {/* Layer 1 */}
       <DialBase />
 
-      {/* Layer 2: scoring bands, visible for dev — RevealCover comes in Step 6 */}
+      {/* Layer 2 */}
       <TargetLayer targetAngle={targetAngle} />
 
-      {/* Layer 3: guess needle always above the target layer */}
+      {/* Layer 3 — fully opaque until revealed */}
+      <RevealCover revealed={revealed} />
+
+      {/* Layer 4 — always above the cover so it stays visible during the animation */}
       <GuessNeedle
         angle={guessAngle}
         cx={CX}

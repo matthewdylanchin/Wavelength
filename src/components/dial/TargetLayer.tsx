@@ -1,6 +1,6 @@
 import { bandPath } from "../../lib/dial";
 import { BANDS } from "../../lib/bands";
-import { CX, CY } from "./Dial";
+import { CX, CY } from "./dialGeometry";
 
 const INNER_R = 120;
 const OUTER_R = 340;

@@ -1,4 +1,4 @@
-import { CX, CY, R } from './Dial'
+import { CX, CY, R } from './dialGeometry'
 
 export default function DialBase() {
   return (
