@@ -1,26 +1,29 @@
 type Props = {
   onSpin: () => void
+  disabled: boolean
 }
 
-export default function SpinKnob({ onSpin }: Props) {
+export default function SpinKnob({ onSpin, disabled }: Props) {
   return (
     <button
       onClick={onSpin}
+      disabled={disabled}
       aria-label="Spin target"
       style={{
         width: 72,
         height: 72,
         borderRadius: '50%',
         border: '2px solid var(--color-cream-shadow)',
-        background: '#4a6741',           // accent-green from the design
-        color: '#f5f0e8',
+        background: disabled ? 'var(--color-cream-dark)' : '#4a6741',
+        color: disabled ? 'var(--color-brown-soft)' : '#f5f0e8',
         fontSize: 28,
-        cursor: 'pointer',
+        cursor: disabled ? 'default' : 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 3px 10px rgba(74, 103, 65, 0.35)',
+        boxShadow: disabled ? 'none' : '0 3px 10px rgba(74, 103, 65, 0.35)',
         flexShrink: 0,
+        opacity: disabled ? 0.45 : 1,
       }}
     >
       ⟳

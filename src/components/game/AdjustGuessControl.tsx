@@ -3,6 +3,7 @@ import { clampAngle } from '../../lib/dial'
 type Props = {
   angle: number
   onChange: (next: number) => void
+  disabled: boolean
 }
 
 const FINE = 2
@@ -12,21 +13,23 @@ function adjust(current: number, delta: number): number {
   return clampAngle(current + delta)
 }
 
-// Large rotary button — coarse adjustment
 function RotaryButton({
   label,
   delta,
   angle,
   onChange,
+  disabled,
 }: {
   label: string
   delta: number
   angle: number
   onChange: (n: number) => void
+  disabled: boolean
 }) {
   return (
     <button
       onClick={() => onChange(adjust(angle, delta))}
+      disabled={disabled}
       aria-label={delta < 0 ? 'Coarse left' : 'Coarse right'}
       style={{
         width: 56,
@@ -37,12 +40,13 @@ function RotaryButton({
         color: 'var(--color-brown-dark)',
         fontSize: 22,
         fontWeight: 700,
-        cursor: 'pointer',
+        cursor: disabled ? 'default' : 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: 'var(--shadow-button)',
+        boxShadow: disabled ? 'none' : 'var(--shadow-button)',
         flexShrink: 0,
+        opacity: disabled ? 0.45 : 1,
       }}
     >
       {label}
@@ -50,7 +54,7 @@ function RotaryButton({
   )
 }
 
-export default function AdjustGuessControl({ angle, onChange }: Props) {
+export default function AdjustGuessControl({ angle, onChange, disabled }: Props) {
   return (
     <div
       style={{
@@ -58,12 +62,11 @@ export default function AdjustGuessControl({ angle, onChange }: Props) {
         alignItems: 'center',
         gap: 12,
         justifyContent: 'center',
+        opacity: disabled ? 0.45 : 1,
       }}
     >
-      {/* Coarse left */}
-      <RotaryButton label="↺" delta={-COARSE} angle={angle} onChange={onChange} />
+      <RotaryButton label="↺" delta={-COARSE} angle={angle} onChange={onChange} disabled={disabled} />
 
-      {/* Center pill with fine controls */}
       <div
         style={{
           display: 'flex',
@@ -72,14 +75,15 @@ export default function AdjustGuessControl({ angle, onChange }: Props) {
           background: 'var(--color-cream-dark)',
           border: '2px solid var(--color-cream-shadow)',
           borderRadius: 999,
-          boxShadow: 'var(--shadow-button)',
+          boxShadow: disabled ? 'none' : 'var(--shadow-button)',
           overflow: 'hidden',
         }}
       >
         <button
           onClick={() => onChange(adjust(angle, -FINE))}
+          disabled={disabled}
           aria-label="Fine left"
-          style={fineBtnStyle}
+          style={{ ...fineBtnStyle, cursor: disabled ? 'default' : 'pointer' }}
         >
           ‹
         </button>
@@ -98,15 +102,15 @@ export default function AdjustGuessControl({ angle, onChange }: Props) {
         </span>
         <button
           onClick={() => onChange(adjust(angle, FINE))}
+          disabled={disabled}
           aria-label="Fine right"
-          style={fineBtnStyle}
+          style={{ ...fineBtnStyle, cursor: disabled ? 'default' : 'pointer' }}
         >
           ›
         </button>
       </div>
 
-      {/* Coarse right */}
-      <RotaryButton label="↻" delta={COARSE} angle={angle} onChange={onChange} />
+      <RotaryButton label="↻" delta={COARSE} angle={angle} onChange={onChange} disabled={disabled} />
     </div>
   )
 }
@@ -119,7 +123,6 @@ const fineBtnStyle: React.CSSProperties = {
   color: 'var(--color-brown-dark)',
   fontSize: 26,
   lineHeight: 1,
-  cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

@@ -1,4 +1,4 @@
-import type { Spectrum } from '../lib/spectra'
+import { randomTarget } from '../lib/dial'
 
 export type Phase =
   | 'idle'
@@ -8,12 +8,17 @@ export type Phase =
   | 'revealing'
   | 'scored'
 
+export type Spectrum = {
+  left: string
+  right: string
+}
+
 export type Round = {
   number: number
   spectrum: Spectrum
   clue: string
-  targetAngle: number
-  guessAngle: number
+  targetAngle: number     // degrees, 0–180 — set on spin, immutable from clue onward
+  guessAngle: number      // degrees, 0–180 — mutable during guessing only
   pointsThisRound: number | null
 }
 
@@ -23,13 +28,15 @@ export type GameState = {
   totalScore: number
 }
 
+const INITIAL_SPECTRUM: Spectrum = { left: 'Freezing', right: 'Scorching' }
+
 export const initialState: GameState = {
-  phase: 'idle',
+  phase: 'spinning',
   round: {
     number: 1,
-    spectrum: { left: 'Freezing', right: 'Scorching' },
+    spectrum: INITIAL_SPECTRUM,
     clue: '',
-    targetAngle: 90,
+    targetAngle: randomTarget(),
     guessAngle: 90,
     pointsThisRound: null,
   },

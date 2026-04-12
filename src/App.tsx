@@ -1,25 +1,23 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import Dial from "./components/dial/Dial";
 import AdjustGuessControl from "./components/game/AdjustGuessControl";
 import SpinKnob from "./components/game/SpinKnob";
-import { randomTarget } from "./lib/dial";
-import { scoreFor } from "./lib/scoring";
+import { gameReducer } from "./state/gameReducer";
+import { initialState } from "./state/gameState";
 
 export default function App() {
-  const [guessAngle, setGuessAngle] = useState(90);
-  const [targetAngle, setTargetAngle] = useState(90);
-  const [revealed, setRevealed] = useState(false);
+  const [state, dispatch] = useReducer(gameReducer, initialState);
+  const { phase, round, totalScore } = state;
 
-  function handleSpin() {
-    const next = randomTarget();
-    setTargetAngle(next);
-    setRevealed(false);
-    console.log("targetAngle:", next.toFixed(2));
-  }
+  const primaryButton = getPrimaryButton(phase);
 
   return (
     <div style={{ padding: "2rem", maxWidth: 900, margin: "0 auto" }}>
-      <Dial guessAngle={guessAngle} targetAngle={targetAngle} revealed={revealed} />
+      <Dial
+        guessAngle={round.guessAngle}
+        targetAngle={round.targetAngle}
+        revealed={phase === "clue" || phase === "scored"}
+      />
 
       <div
         style={{
@@ -30,31 +28,55 @@ export default function App() {
           gap: 24,
         }}
       >
-        <SpinKnob onSpin={handleSpin} />
-        <AdjustGuessControl angle={guessAngle} onChange={setGuessAngle} />
-        <button
-          onClick={() => setRevealed((r) => !r)}
-          style={{
-            padding: "10px 20px",
-            borderRadius: 8,
-            border: "2px solid var(--color-cream-shadow)",
-            background: revealed ? "var(--color-cream-dark)" : "#4a6741",
-            color: revealed ? "var(--color-brown-dark)" : "#f5f0e8",
-            fontWeight: 600,
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          {revealed ? "Hide" : "Reveal"}
-        </button>
+        <SpinKnob
+          onSpin={() => dispatch({ type: "SPIN" })}
+          disabled={phase !== "spinning"}
+        />
+
+        <AdjustGuessControl
+          angle={round.guessAngle}
+          onChange={(next) => dispatch({ type: "ADJUST_GUESS", absolute: next })}
+          disabled={phase !== "guessing"}
+        />
+
+        {primaryButton && (
+          <button
+            onClick={() => dispatch(primaryButton.action)}
+            style={{
+              padding: "10px 20px",
+              borderRadius: 8,
+              border: "2px solid var(--color-cream-shadow)",
+              background: "#4a6741",
+              color: "#f5f0e8",
+              fontWeight: 600,
+              cursor: "pointer",
+              fontSize: 14,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {primaryButton.label}
+          </button>
+        )}
       </div>
 
-      {/* DEV ONLY — removed in Step 7; only shown after reveal so score can't be seen early */}
-      {revealed && (
+      {phase === "scored" && (
         <p style={{ textAlign: "center", marginTop: "1rem", fontFamily: "monospace" }}>
-          Score: {scoreFor(guessAngle, targetAngle)}
+          Round {round.number}: {round.pointsThisRound} pts — Total: {totalScore + (round.pointsThisRound ?? 0)} pts
         </p>
       )}
     </div>
   );
+}
+
+type PrimaryButton = { label: string; action: Parameters<typeof gameReducer>[1] }
+
+function getPrimaryButton(phase: string): PrimaryButton | null {
+  switch (phase) {
+    case "idle":     return { label: "Start round",   action: { type: "START_ROUND" } }
+    case "spinning": return { label: "Lock target",   action: { type: "LOCK_TARGET" } }
+    case "clue":     return { label: "Pass to team",  action: { type: "SUBMIT_CLUE", clue: "" } }
+    case "guessing": return { label: "Reveal",        action: { type: "REVEAL" } }
+    case "scored":   return { label: "Next round",    action: { type: "NEXT_ROUND" } }
+    default:         return null
+  }
 }
