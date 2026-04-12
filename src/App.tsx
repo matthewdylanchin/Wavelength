@@ -1,6 +1,8 @@
-import { useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Dial from "./components/dial/Dial";
 import AdjustGuessControl from "./components/game/AdjustGuessControl";
+import ClueDisplay from "./components/game/ClueDisplay";
+import ClueInput from "./components/game/ClueInput";
 import SpinKnob from "./components/game/SpinKnob";
 import { gameReducer } from "./state/gameReducer";
 import { initialState } from "./state/gameState";
@@ -9,15 +11,42 @@ export default function App() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const { phase, round, totalScore } = state;
 
-  const primaryButton = getPrimaryButton(phase);
+  // Draft clue lives outside the reducer — don't persist half-typed text in game state
+  const [draftClue, setDraftClue] = useState("");
+
+  // Reset draft when a new spin phase begins
+  useEffect(() => {
+    if (phase === "spinning") setDraftClue("");
+  }, [phase]);
+
+  function submitClue() {
+    dispatch({ type: "SUBMIT_CLUE", clue: draftClue.trim() });
+  }
+
+  const primaryButton = getPrimaryButton(phase, submitClue, () =>
+    dispatch({ type: phase === "spinning" ? "LOCK_TARGET" : phase === "guessing" ? "REVEAL" : "NEXT_ROUND" })
+  );
 
   return (
     <div style={{ padding: "2rem", maxWidth: 900, margin: "0 auto" }}>
+      <ClueDisplay phase={phase} spectrum={round.spectrum} clue={round.clue} />
+
       <Dial
         guessAngle={round.guessAngle}
         targetAngle={round.targetAngle}
         revealed={phase === "clue" || phase === "scored"}
+        spectrum={round.spectrum}
       />
+
+      {phase === "clue" && (
+        <div style={{ marginTop: "1rem" }}>
+          <ClueInput
+            value={draftClue}
+            onChange={setDraftClue}
+            onSubmit={submitClue}
+          />
+        </div>
+      )}
 
       <div
         style={{
@@ -41,17 +70,19 @@ export default function App() {
 
         {primaryButton && (
           <button
-            onClick={() => dispatch(primaryButton.action)}
+            onClick={primaryButton.onClick}
+            disabled={primaryButton.disabled}
             style={{
               padding: "10px 20px",
               borderRadius: 8,
               border: "2px solid var(--color-cream-shadow)",
-              background: "#4a6741",
-              color: "#f5f0e8",
+              background: primaryButton.disabled ? "var(--color-cream-dark)" : "#4a6741",
+              color: primaryButton.disabled ? "var(--color-brown-soft)" : "#f5f0e8",
               fontWeight: 600,
-              cursor: "pointer",
+              cursor: primaryButton.disabled ? "default" : "pointer",
               fontSize: 14,
               whiteSpace: "nowrap",
+              opacity: primaryButton.disabled ? 0.6 : 1,
             }}
           >
             {primaryButton.label}
@@ -61,22 +92,33 @@ export default function App() {
 
       {phase === "scored" && (
         <p style={{ textAlign: "center", marginTop: "1rem", fontFamily: "monospace" }}>
-          Round {round.number}: {round.pointsThisRound} pts — Total: {totalScore + (round.pointsThisRound ?? 0)} pts
+          Round {round.number}: {round.pointsThisRound} pts —{" "}
+          Total: {totalScore + (round.pointsThisRound ?? 0)} pts
         </p>
       )}
     </div>
   );
 }
 
-type PrimaryButton = { label: string; action: Parameters<typeof gameReducer>[1] }
+type PrimaryButton = { label: string; onClick: () => void; disabled: boolean }
 
-function getPrimaryButton(phase: string): PrimaryButton | null {
+function getPrimaryButton(
+  phase: string,
+  submitClue: () => void,
+  dispatch: () => void,
+): PrimaryButton | null {
   switch (phase) {
-    case "idle":     return { label: "Start round",   action: { type: "START_ROUND" } }
-    case "spinning": return { label: "Lock target",   action: { type: "LOCK_TARGET" } }
-    case "clue":     return { label: "Pass to team",  action: { type: "SUBMIT_CLUE", clue: "" } }
-    case "guessing": return { label: "Reveal",        action: { type: "REVEAL" } }
-    case "scored":   return { label: "Next round",    action: { type: "NEXT_ROUND" } }
-    default:         return null
+    case "idle":
+      return { label: "Start round", onClick: dispatch, disabled: false }
+    case "spinning":
+      return { label: "Lock target", onClick: dispatch, disabled: false }
+    case "clue":
+      return { label: "Pass to team", onClick: submitClue, disabled: false }
+    case "guessing":
+      return { label: "Reveal", onClick: dispatch, disabled: false }
+    case "scored":
+      return { label: "Next round", onClick: dispatch, disabled: false }
+    default:
+      return null
   }
 }

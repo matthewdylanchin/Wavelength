@@ -1,5 +1,6 @@
 import { clampAngle, randomTarget } from '../lib/dial'
 import { scoreFor } from '../lib/scoring'
+import { pickRandomSpectrum } from '../lib/spectra'
 import type { Action } from './actions'
 import type { GameState } from './gameState'
 
@@ -14,6 +15,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         phase: 'spinning',
         round: {
           ...round,
+          spectrum: pickRandomSpectrum(round.spectrum),
           clue: '',
           targetAngle: randomTarget(),
           guessAngle: 90,
@@ -75,6 +77,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
         round: {
           ...round,
           number: round.number + 1,
+          spectrum: pickRandomSpectrum(round.spectrum),
           clue: '',
           targetAngle: randomTarget(),
           guessAngle: 90,
