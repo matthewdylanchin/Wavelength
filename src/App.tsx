@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import AppShell from "./components/shell/AppShell";
 import Dial from "./components/dial/Dial";
 import AdjustGuessControl from "./components/game/AdjustGuessControl";
 import ClueDisplay from "./components/game/ClueDisplay";
@@ -31,7 +31,7 @@ export default function App() {
   );
 
   return (
-    <div style={{ padding: "2rem", maxWidth: 900, margin: "0 auto" }}>
+    <AppShell spectrum={round.spectrum} roundNumber={round.number}>
       <ClueDisplay phase={phase} spectrum={round.spectrum} clue={round.clue} />
 
       <Dial
@@ -42,20 +42,7 @@ export default function App() {
         guessingEnabled={phase === "guessing"}
       />
 
-      <AnimatePresence>
-        {(phase === "clue" || phase === "guessing" || phase === "scored") && (
-          <motion.div
-            key="spectrum-card"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            style={{ marginTop: "1rem" }}
-          >
-            <SpectrumCard spectrum={round.spectrum} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SpectrumCard spectrum={round.spectrum} />
 
       {phase === "clue" && (
         <div style={{ marginTop: "1rem" }}>
@@ -116,7 +103,7 @@ export default function App() {
           roundNumber={round.number}
         />
       )}
-    </div>
+    </AppShell>
   );
 }
 

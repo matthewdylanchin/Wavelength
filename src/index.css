@@ -7,7 +7,7 @@
 
 body {
   margin: 0;
-  background-color: var(--color-cream);
+  background-color: var(--bg-page);
   color: var(--color-brown-dark);
   font-family: var(--font-ui);
   min-height: 100vh;

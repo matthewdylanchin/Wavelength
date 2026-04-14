@@ -23,4 +23,22 @@
   /* Shadows */
   --shadow-dial: 0 8px 32px rgba(92, 74, 50, 0.18);
   --shadow-button: 0 2px 8px rgba(92, 74, 50, 0.15);
+
+  /* Shell backgrounds */
+  --bg-page: #f2ece0;          /* full-viewport page backdrop */
+  --bg-window: #f5f0e8;        /* window interior (same as cream) */
+  --bg-chrome: #e8e0d0;        /* traffic-light bar — slightly warmer/darker */
+  --bg-panel: #ede6d4;         /* sidebar panel */
+  --bg-card: #faf7f2;          /* cards / pills */
+
+  /* Shell shadow */
+  --shadow-window: 0 20px 60px rgba(62, 42, 31, 0.22), 0 4px 12px rgba(62, 42, 31, 0.10);
+
+  /* macOS-style traffic light dots — muted, warm */
+  --dot-red:   #c9706a;
+  --dot-amber: #c9a46a;
+  --dot-green: #6a9a5e;
+
+  /* Accent */
+  --accent-green: #4a6741;
 }
