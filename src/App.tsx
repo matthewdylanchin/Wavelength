@@ -37,6 +37,8 @@ export default function App() {
         targetAngle={round.targetAngle}
         revealed={phase === "clue" || phase === "scored"}
         spectrum={round.spectrum}
+        onGuessAngleChange={(next) => dispatch({ type: "ADJUST_GUESS", absolute: next })}
+        guessingEnabled={phase === "guessing"}
       />
 
       {phase === "clue" && (

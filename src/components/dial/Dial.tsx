@@ -13,9 +13,11 @@ type Props = {
   targetAngle: number  // degrees, 0–180
   revealed: boolean
   spectrum: Spectrum
+  onGuessAngleChange?: (angle: number) => void
+  guessingEnabled?: boolean
 }
 
-export default function Dial({ guessAngle, targetAngle, revealed, spectrum }: Props) {
+export default function Dial({ guessAngle, targetAngle, revealed, spectrum, onGuessAngleChange, guessingEnabled }: Props) {
   return (
     <svg
       viewBox="0 0 800 450"
@@ -36,6 +38,8 @@ export default function Dial({ guessAngle, targetAngle, revealed, spectrum }: Pr
         cx={CX}
         cy={CY}
         length={NEEDLE_LENGTH}
+        onAngleChange={onGuessAngleChange}
+        disabled={!guessingEnabled}
       />
     </svg>
   )
