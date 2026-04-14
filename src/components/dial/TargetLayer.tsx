@@ -1,9 +1,9 @@
 import { bandPath } from "../../lib/dial";
 import { BANDS } from "../../lib/bands";
-import { CX, CY } from "./dialGeometry";
+import { CX, CY, R } from "./dialGeometry";
 
 const INNER_R = 120;
-const OUTER_R = 340;
+const OUTER_R = R;
 
 // Colors parallel to BANDS by points value — visual concern, lives here not in bands.ts
 const BAND_COLOR: Record<number, string> = {

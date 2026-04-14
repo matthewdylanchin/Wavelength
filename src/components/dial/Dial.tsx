@@ -1,4 +1,3 @@
-import type { Spectrum } from '../../lib/spectra'
 import DialBase from './DialBase'
 import GuessNeedle from './GuessNeedle'
 import RevealCover from './RevealCover'
@@ -12,19 +11,18 @@ type Props = {
   guessAngle: number   // degrees, 0–180
   targetAngle: number  // degrees, 0–180
   revealed: boolean
-  spectrum: Spectrum
   onGuessAngleChange?: (angle: number) => void
   guessingEnabled?: boolean
 }
 
-export default function Dial({ guessAngle, targetAngle, revealed, spectrum, onGuessAngleChange, guessingEnabled }: Props) {
+export default function Dial({ guessAngle, targetAngle, revealed, onGuessAngleChange, guessingEnabled }: Props) {
   return (
     <svg
       viewBox="0 0 800 450"
       style={{ width: '100%', maxWidth: 800, display: 'block' }}
     >
       {/* Layer 1 */}
-      <DialBase spectrum={spectrum} />
+      <DialBase />
 
       {/* Layer 2 */}
       <TargetLayer targetAngle={targetAngle} />

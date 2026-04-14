@@ -1,10 +1,12 @@
 import { useEffect, useReducer, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Dial from "./components/dial/Dial";
 import AdjustGuessControl from "./components/game/AdjustGuessControl";
 import ClueDisplay from "./components/game/ClueDisplay";
 import ClueInput from "./components/game/ClueInput";
 import SpinKnob from "./components/game/SpinKnob";
 import ScoreDisplay from "./components/game/ScoreDisplay";
+import SpectrumCard from "./components/game/SpectrumCard";
 import { gameReducer } from "./state/gameReducer";
 import { initialState } from "./state/gameState";
 
@@ -36,10 +38,24 @@ export default function App() {
         guessAngle={round.guessAngle}
         targetAngle={round.targetAngle}
         revealed={phase === "clue" || phase === "scored"}
-        spectrum={round.spectrum}
         onGuessAngleChange={(next) => dispatch({ type: "ADJUST_GUESS", absolute: next })}
         guessingEnabled={phase === "guessing"}
       />
+
+      <AnimatePresence>
+        {(phase === "clue" || phase === "guessing" || phase === "scored") && (
+          <motion.div
+            key="spectrum-card"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            style={{ marginTop: "1rem" }}
+          >
+            <SpectrumCard spectrum={round.spectrum} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {phase === "clue" && (
         <div style={{ marginTop: "1rem" }}>
